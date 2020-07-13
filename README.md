@@ -1,5 +1,5 @@
 # Deploying Power BI reports using Azure Devops
-In this article, we walk through a set up using  [Power BI Service](https://powerbi.microsoft.com/p) and [Azure Devops](https://dev.azure.com/) to deploy the a Power BI Report (.pbix file) to different workspaces; each with a different data source.  
+In this article, we walk through a set up using  [Power BI Service](https://powerbi.microsoft.com/p) and [Azure Devops](https://dev.azure.com/) to deploy a Power BI Report (.pbix file) to different workspaces; each with a different data source.  
 
 ## Key Concepts
 - Each Power BI Service workspace represents a separate environment. 
@@ -8,7 +8,7 @@ In this article, we walk through a set up using  [Power BI Service](https://powe
 - The same Power BI report is deployed to different workspaces.  
  
 ## Setting up the Data Sources
-For this sample, we assume a *workspace-per-customer* approach and create three databases and three Power BI Service workspaces.  The *My workspace* represents the development envirionment to build and test the report while the workspaces X and Y represents the production environments for customer X and Y respectively.    
+For this sample, we assume a *workspace-per-customer* approach and create three databases and three Power BI Service workspaces.  The default *My workspace* represents the development envirionment to build and test the report while the workspaces X and Y represents the production environments for customer X and Y respectively.    
 
 | Workspace | Datasoure |
 | -- | -- |
@@ -21,7 +21,7 @@ For this sample, we assume a *workspace-per-customer* approach and create three 
 3. Repeat steps 1 and 2 to create a customer X database (server: *customerXdbsvr*, database: *customerxdb*) and run the [customerXdb.sql](./databases/customerXdb.sql) script. 
 4. Lastly, repeat steps 1 and 2 to create a customer Y database(server: *customerydbsvr*, database: *customerydb*) and run the [customerYdb.sql](./databases/customerYdb.sql) script.
 
-As a quick check, query the customer tables of all three databases and you should notice the dev database holds customers *Customers A, B, C*..., while databases customer X and Y contain males and females names respectively. 
+As a quick check, query the customer tables of all three databases and you will notice the dev database holds customers *Customers A, B, C*..., while databases customer X and Y contain males and females names respectively. 
 
 ## Setting up the Azure Devops CI/CD pipelines
 10. Sign into your [Azure Devops](https://dev.azure.com) instance and create a new devops project called *pbi-devops*.
@@ -29,7 +29,7 @@ As a quick check, query the customer tables of all three databases and you shoul
 12. Add the *Power BI Action* task to your Azure Devops instance (https://marketplace.visualstudio.com/items?itemName=maikvandergaag.maikvandergaag-power-bi-actions).
 
 ### Create a Build Pipeline
-13. Create a new pipeline that copies and publishes the .pbix file using YAML.
+13. Create a new Build Pipeline in Azure Devops that copies and publishes the .pbix file using YAML.
 ```
 trigger:
 - master
@@ -49,20 +49,21 @@ steps:
 ```
 ![](./images/cd-pipleline.jpg)
 
-### Register an Azure AD App and setup of Service Connection
-For the purposes of this sample, we will be using a *Master Account* to access the underlying Power BI Apis to automate the deployments of the report to the workspaces.  To setup a Service Principal (SPN) instead, you can refer to this [MS Doc](https://docs.microsoft.com/en-us/power-bi/developer/embedded/embed-service-principal).
+### Register an Azure AD App
+For this sample, we will be using a *Master Account* to access the underlying Power BI APIs required by the DevOps Release Pipeline Tasks.  To setup a Service Principal (SPN) instead, refer to this [MS Doc](https://docs.microsoft.com/en-us/power-bi/developer/embedded/embed-service-principal).
 
 **Important:** Make sure to create the App Registration in the same Azure AD tenant/organization of the Power BI Service Workspace.  As a quick test, login to Power BI Service with the account you intend to use as the Master Account.    
 
-12. Register an Azure AD application as documented [here](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) and capture the its Application ID.
-13. Click *API Permissions*, click *+ Add a permission*, select the *Power BI Service* from the list of Microsoft APIs.
-14. Select *Delegated Permissions* and select the **Dataset.ReadWrite.All**, **Workspace.ReadWrite.All** and **Metadata.View_Any**.
-15. Click *Grant admin consent for Default Directory* and click *Yes*.
+12. Sign in to your Azure Portal.
+13. Register an Azure AD application as documented [here](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) and capture the Application/Client ID.
+14. Click *API Permissions*, click *+ Add a permission*, select the *Power BI Service* from the list of Microsoft APIs.
+15. Select *Delegated Permissions* and select the **Dataset.ReadWrite.All**, **Workspace.ReadWrite.All** and **Metadata.View_Any**.
+16. Click *Grant admin consent for Default Directory* and click *Yes*.
     ![](./images/aad_apipermissions.jpg)
 
 
 ### Create a Release Pipeline
-16.  Create a new Release pipeline.
+16. Create a new Release pipeline.
 17. Add an artifact using the build pipeline source.
     ![](./images/ci-artifact.jpg)
 14. Add a new Stage with an *Empty Job* and name it **Publish Customer X PBI Reports**.
@@ -112,18 +113,18 @@ For the purposes of this sample, we will be using a *Master Account* to access t
 
 19. Save the Pipeline.
 20. Finally, run the Build and Release pipelines.
-21. If pipelines succesful, sign into your Power BI Workspace and verify the report and its dataset.
+21. If pipelines were succesful, sign in to your Power BI Workspace and verify the report and its dataset.
 ![](./images/pbiservce_custX.jpg)
 
-22. Repeat steps 13 through 21 but for Customer Y.
+22. Repeat steps 13 through 21 but for Customer Y with the following values:
     - Workspace: **customery**
     - Old server: **customerdevdbsvr.database.windows.net**
     - New server: **customerydbsvr.database.windows.net**
     - Old database: **customerdevdb**
     - New database: **customerydb**
-23. The final Release pipeline should look like this.
+23. The final Release pipeline should look similar to this.
 ![](./images/devops_releasePipeline.jpg) 
 
 ### References:
-- https://community.powerbi.com/t5/Community-Blog/PowerBI-CICD-using-Azure-DevOps/ba-p/769244
+- *PowerBI - CICD using Azure DevOps* (https://community.powerbi.com/t5/Community-Blog/PowerBI-CICD-using-Azure-DevOps/ba-p/769244)
   
