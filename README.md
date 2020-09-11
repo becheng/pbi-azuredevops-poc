@@ -101,6 +101,8 @@ For this sample, we will be using a *Master Account* to access the underlying Po
 
 ![](./images/stage_pbiaction-udpatedatasrc.jpg)
 
+**Important** At the time of writing this article (Aug 2020), the *Power BI Actions* extension has a limitation where datasource credentials are not updatable; they have to manually configured on the PowerBI Servic portal.  To overcome this limitation (and others), use Powershell scripting instead (see [example](https://community.powerbi.com/t5/Community-Blog/PowerBI-CICD-using-Azure-DevOps/ba-p/769244)).   
+
 18. Save the Pipeline and add another *Power BI Actions* Task to <ins>refresh the report's dataset</ins>:
   - Display Name: **Refresh Dataset**
   - Authenication: **User** (if using SPN, than select Service Principal)
