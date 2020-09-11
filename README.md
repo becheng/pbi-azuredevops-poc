@@ -117,10 +117,9 @@ For this sample, we will be using a *Master Account* to access the underlying Po
 ![](./images/pbiservce_custX.jpg)
 
 22. Repeat steps 13 through 21 but for Customer Y with the following values:
+    - Display Name: ***Change "Customer X" to "Customer Y"***  
     - Workspace: **customery**
-    - Old server: **customerdevdbsvr.database.windows.net**
     - New server: **customerydbsvr.database.windows.net**
-    - Old database: **customerdevdb**
     - New database: **customerydb**
 23. The final Release pipeline should look similar to this.
 ![](./images/devops_releasePipeline.jpg) 
